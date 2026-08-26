@@ -38,6 +38,8 @@ uv run pytest
 
 Synthetic gold scenarios live in [gold/](gold/README.md). They are executable conformance fixtures, not legal conclusions. The public production entry point accepts only released, semantically validated rulesets; the currently tracked jurisdiction artifacts are explicitly unreviewed drafts.
 
+The [compile-plane pipeline](PIPELINE.md) is available for reproducible candidate generation and review triage. It is intentionally separate from the evaluator and has no embedded model provider or API key requirement.
+
 ## Security and scope
 
 This repository is designed for public law and synthetic fixtures only. Please see [SECURITY.md](SECURITY.md) for responsible reporting. Issues that could produce a permissive evaluation error are treated as security issues.
