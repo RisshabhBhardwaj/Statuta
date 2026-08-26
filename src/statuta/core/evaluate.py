@@ -9,6 +9,7 @@ from enum import StrEnum
 from typing import Any
 
 from statuta.core.predicate import TruthValue, evaluate_predicate
+from statuta.core.validation import validate_ruleset
 
 
 class VerdictValue(StrEnum):
@@ -94,7 +95,11 @@ def evaluate(context: Mapping[str, Any], rulesets: Sequence[Mapping[str, Any]]) 
     path = [f"selected {ruleset['ruleset_id']}" for ruleset in selected]
     for ruleset in selected:
         for rule in ruleset.get("rules", []):
-            if evaluate_predicate(rule["applies_when"], context) is not TruthValue.TRUE:
+            applies = evaluate_predicate(rule["applies_when"], context)
+            if applies is TruthValue.UNKNOWN:
+                indeterminate.append(rule["id"])
+                continue
+            if applies is not TruthValue.TRUE:
                 continue
             result = evaluate_predicate(rule["condition"], context)
             if result is TruthValue.UNKNOWN:
@@ -167,3 +172,18 @@ def evaluate(context: Mapping[str, Any], rulesets: Sequence[Mapping[str, Any]]) 
         tuple(path + ["no rule fired"]),
         coverage,
     )
+
+
+def evaluate_released(context: Mapping[str, Any], rulesets: Sequence[Mapping[str, Any]]) -> Verdict:
+    """Evaluate only semantically validated, released rulesets.
+
+    ``evaluate`` intentionally accepts minimal synthetic fixtures for runtime
+    tests. Production callers must use this entry point so a draft corpus
+    cannot be evaluated by accident.
+    """
+    for ruleset in rulesets:
+        if ruleset.get("artifact_status") != "released":
+            msg = "evaluate_released accepts only rulesets with artifact_status='released'"
+            raise ValueError(msg)
+        validate_ruleset(ruleset)
+    return evaluate(context, rulesets)

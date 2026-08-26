@@ -11,10 +11,17 @@ __all__ = [
     "Verdict",
     "VerdictValue",
     "evaluate",
+    "evaluate_released",
     "evaluate_predicate",
     "read_snapshot",
     "select_rulesets",
     "validate_ruleset",
     "verify_grounding",
 ]
-from statuta.core.evaluate import Verdict, VerdictValue, evaluate, select_rulesets
+from statuta.core.evaluate import (
+    Verdict,
+    VerdictValue,
+    evaluate,
+    evaluate_released,
+    select_rulesets,
+)

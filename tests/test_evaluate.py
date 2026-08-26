@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from statuta import VerdictValue, evaluate, select_rulesets
+from statuta import VerdictValue, evaluate, evaluate_released, select_rulesets
 
 
 def _context() -> dict[str, Any]:
@@ -101,3 +101,26 @@ def test_numeric_boundaries_and_missing_nexus_are_safe() -> None:
 
     no_nexus = {"query": {"occurred_at": "2026-06-01T12:00:00-04:00"}}
     assert evaluate(no_nexus, [_ruleset(retention_limit)]).value is VerdictValue.UNREGULATED
+
+
+def test_unknown_applicability_is_indeterminate() -> None:
+    requires_capture_jurisdiction = _rule(
+        "AA-PRO-001",
+        "prohibited",
+        {"always": True},
+    )
+    requires_capture_jurisdiction["applies_when"] = {
+        "field": "record.origin_agency_type",
+        "op": "eq",
+        "value": "law_enforcement",
+    }
+
+    verdict = evaluate(_context(), [_ruleset(requires_capture_jurisdiction)])
+
+    assert verdict.value is VerdictValue.INDETERMINATE
+    assert verdict.coverage["indeterminate_rules"] == ["AA-PRO-001"]
+
+
+def test_released_entry_point_rejects_draft_artifacts() -> None:
+    with pytest.raises(ValueError, match="only rulesets"):
+        evaluate_released(_context(), [_ruleset()])
