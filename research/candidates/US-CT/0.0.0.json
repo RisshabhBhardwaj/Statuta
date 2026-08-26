@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_status": "draft",
+  "ruleset_id": "US-CT",
+  "ruleset_version": "0.0.0",
+  "jurisdiction": {"level": "state", "code": "US-CT", "name": "Connecticut"},
+  "legal_validity": {
+    "effective_at": "2026-10-01T00:00:00-04:00",
+    "repealed_or_superseded_at": null,
+    "temporal_status": "verified",
+    "time_basis": "jurisdiction_local",
+    "authority": {"citation": "Conn. Pub. Act No. 26-14, § 10", "snapshot_sha256": "5da7c7c04b22c954c3dc23b1511726b5493cfd1a7f745b183c3362ae1a331b2a", "span": [60192, 60321]}
+  },
+  "source": {"source_id": "US-CT-PA-26-14-20260826"},
+  "definitions": [],
+  "rules": [{"id": "CT-RET-001", "rule_type": "retention", "effect": "prohibited", "applies_when": {"field": "record.captured_jurisdiction", "op": "eq", "value": "US-CT"}, "condition": {"field": "record.age_days", "op": "gt", "value": 21}, "grounding": {"provision_id": "PA 26-14 § 10(b)(2)(A)", "quote": "agency or by a private vendor under contract with a public agency shall\nnot be retained for a period in excess of twenty-one days", "span": [60192, 60321], "snapshot_sha256": "5da7c7c04b22c954c3dc23b1511726b5493cfd1a7f745b183c3362ae1a331b2a"}, "provenance": {"method": "hand_encoded", "review_notes": "Draft only; exceptions are recorded in coverage."}}],
+  "coverage": {"status": "draft_unreviewed", "known_gaps": ["PA 26-14 § 10(b)(2) exceptions require fields for court process, fee collection, supervisory designation, and data aggregation."]},
+  "provenance": {"review_status": "unreviewed"}
+}

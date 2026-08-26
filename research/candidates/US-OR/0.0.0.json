@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_status": "draft",
+  "ruleset_id": "US-OR",
+  "ruleset_version": "0.0.0",
+  "jurisdiction": {"level": "state", "code": "US-OR", "name": "Oregon"},
+  "legal_validity": {
+    "effective_at": null,
+    "repealed_or_superseded_at": null,
+    "temporal_status": "unverified",
+    "time_basis": "jurisdiction_local",
+    "authority": {"citation": "2026 Or. Laws ch. 77", "snapshot_sha256": "cf95fc066b3b747b89697bba4ffdd9b0292ea288a86557c59e6835d6669dd08a", "span": [10596, 10720]}
+  },
+  "source": {"source_id": "US-OR-SB-1516-ENROLLED-20260826"},
+  "definitions": [],
+  "rules": [{"id": "OR-RET-001", "rule_type": "retention", "effect": "prohibited", "applies_when": {"field": "record.captured_jurisdiction", "op": "eq", "value": "US-OR"}, "condition": {"field": "record.age_days", "op": "gt", "value": 30}, "grounding": {"provision_id": "2026 Or. Laws ch. 77 § 4(3)(a)", "quote": "the captured license plate data may be retained for no more than 30 days\nafter the captured license plate data is collected.", "span": [10596, 10720], "snapshot_sha256": "cf95fc066b3b747b89697bba4ffdd9b0292ea288a86557c59e6835d6669dd08a"}, "provenance": {"method": "hand_encoded", "review_notes": "Draft only; court-proceeding and investigation exceptions are recorded in coverage."}}],
+  "coverage": {"status": "draft_unreviewed", "known_gaps": ["Exact effective-on-passage date is unverified.", "Section 4(3)(b)-(c) exceptions require additional context."]},
+  "provenance": {"review_status": "unreviewed"}
+}

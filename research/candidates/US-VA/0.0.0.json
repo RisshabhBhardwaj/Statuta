@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_status": "draft",
+  "ruleset_id": "US-VA",
+  "ruleset_version": "0.0.0",
+  "jurisdiction": {"level": "state", "code": "US-VA", "name": "Virginia"},
+  "legal_validity": {
+    "effective_at": null,
+    "repealed_or_superseded_at": null,
+    "temporal_status": "unverified",
+    "time_basis": "jurisdiction_local",
+    "authority": {"citation": "Va. Code Ann. § 2.2-5517", "snapshot_sha256": "43cbe6653d3fca4e89f57b34bd9a43e51e9a899e2062a46227a98f4e42750628", "span": [7695, 7763]}
+  },
+  "source": {"source_id": "US-VA-2.2-5517-20260826"},
+  "definitions": [],
+  "rules": [{"id": "VA-RET-001", "rule_type": "retention", "effect": "prohibited", "applies_when": {"field": "record.captured_jurisdiction", "op": "eq", "value": "US-VA"}, "condition": {"field": "record.age_days", "op": "gt", "value": 21}, "grounding": {"provision_id": "Va. Code § 2.2-5517(E)", "quote": "System data shall be purged after 21 days of the date of its capture", "span": [7695, 7763], "snapshot_sha256": "43cbe6653d3fca4e89f57b34bd9a43e51e9a899e2062a46227a98f4e42750628"}, "provenance": {"method": "hand_encoded", "review_notes": "Draft only; investigation, prosecution, and civil-action exceptions are recorded in coverage."}}],
+  "coverage": {"status": "draft_unreviewed", "known_gaps": ["Historical validity interval remains unverified.", "Section 2.2-5517(E) exception end conditions require additional context."]},
+  "provenance": {"review_status": "unreviewed"}
+}

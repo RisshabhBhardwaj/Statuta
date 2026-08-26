@@ -1,5 +1,21 @@
 """Public package surface for statuta."""
 
-from statuta.core import SemanticValidationError, TruthValue, evaluate_predicate, validate_ruleset
+from statuta.core import (
+    GroundingError,
+    SemanticValidationError,
+    TruthValue,
+    evaluate_predicate,
+    read_snapshot,
+    validate_ruleset,
+    verify_grounding,
+)
 
-__all__ = ["SemanticValidationError", "TruthValue", "evaluate_predicate", "validate_ruleset"]
+__all__ = [
+    "GroundingError",
+    "SemanticValidationError",
+    "TruthValue",
+    "evaluate_predicate",
+    "read_snapshot",
+    "validate_ruleset",
+    "verify_grounding",
+]

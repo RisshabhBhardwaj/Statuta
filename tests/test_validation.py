@@ -12,9 +12,11 @@ from statuta import SemanticValidationError, validate_ruleset
 
 def _ruleset() -> dict[str, Any]:
     return {
+        "artifact_status": "draft",
         "legal_validity": {
             "effective_at": "2026-01-01T00:00:00-05:00",
             "repealed_or_superseded_at": None,
+            "temporal_status": "verified",
             "authority": {"span": [1, 2]},
         },
         "rules": [
@@ -90,6 +92,19 @@ def test_accepts_a_valid_released_ruleset() -> None:
         (
             lambda value: value["legal_validity"].update({"effective_at": "not-a-timestamp"}),
             "invalid ISO-8601",
+        ),
+        (
+            lambda value: value.update({"artifact_status": "released"}),
+            "released rules require independent review",
+        ),
+        (
+            lambda value: (
+                value["legal_validity"].update(
+                    {"effective_at": None, "temporal_status": "unverified"}
+                )
+                or value.update({"artifact_status": "released"})
+            ),
+            "released rulesets require a verified effective_at",
         ),
         (
             lambda value: value["rules"][0].update({"requirements": "not-an-array"}),

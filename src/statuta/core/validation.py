@@ -151,10 +151,20 @@ def _validate_rule(rule: Mapping[str, Any], path: str) -> None:
 def validate_ruleset(ruleset: Mapping[str, Any]) -> None:
     """Validate runtime invariants that JSON Schema alone cannot express."""
     artifact = _require_mapping(ruleset, "ruleset")
+    artifact_status = artifact.get("artifact_status")
+    if artifact_status not in {"draft", "released"}:
+        _fail("ruleset.artifact_status", "must be draft or released")
     validity = _require_mapping(artifact.get("legal_validity"), "ruleset.legal_validity")
     effective = validity.get("effective_at")
     superseded = validity.get("repealed_or_superseded_at")
-    if not isinstance(effective, str):
+    temporal_status = validity.get("temporal_status")
+    if temporal_status not in {"verified", "unverified"}:
+        _fail("ruleset.legal_validity.temporal_status", "must be verified or unverified")
+    if artifact_status == "released" and (
+        not isinstance(effective, str) or temporal_status != "verified"
+    ):
+        _fail("ruleset.legal_validity", "released rulesets require a verified effective_at")
+    if effective is not None and not isinstance(effective, str):
         _fail("ruleset.legal_validity.effective_at", "must be an ISO-8601 timestamp")
     if superseded is not None and not isinstance(superseded, str):
         _fail(
@@ -162,13 +172,15 @@ def validate_ruleset(ruleset: Mapping[str, Any]) -> None:
             "must be an ISO-8601 timestamp or null",
         )
     try:
-        effective_at = datetime.fromisoformat(effective)
+        effective_at = datetime.fromisoformat(effective) if effective is not None else None
         superseded_at = datetime.fromisoformat(superseded) if superseded is not None else None
     except (TypeError, ValueError) as error:
         raise SemanticValidationError(
             "ruleset.legal_validity: invalid ISO-8601 timestamp"
         ) from error
-    if superseded_at is not None and superseded_at <= effective_at:
+    if effective_at is None and superseded_at is not None:
+        _fail("ruleset.legal_validity", "supersession requires an effective_at")
+    if effective_at is not None and superseded_at is not None and superseded_at <= effective_at:
         _fail("ruleset.legal_validity", "supersession must be later than effective_at")
     authority = _require_mapping(validity.get("authority"), "ruleset.legal_validity.authority")
     _validate_span(authority.get("span"), "ruleset.legal_validity.authority.span")
@@ -181,6 +193,8 @@ def validate_ruleset(ruleset: Mapping[str, Any]) -> None:
             _fail(f"ruleset.rules[{index}].id", "must be a unique string")
         rule_ids.add(rule_id)
         _validate_rule(rule, f"ruleset.rules[{index}]")
+        if artifact_status == "released" and rule["provenance"].get("reviewed_by") is None:
+            _fail(f"ruleset.rules[{index}].provenance", "released rules require independent review")
     for index, raw_rule in enumerate(rules):
         for exception in _require_sequence(
             raw_rule.get("exceptions", []), f"ruleset.rules[{index}].exceptions"
