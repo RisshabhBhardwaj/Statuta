@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://statuta.dev/schema/gold-scenario.schema.json",
+  "title": "GoldScenario",
+  "type": "object",
+  "required": ["id", "context", "jurisdictions", "expected_verdict", "justification", "source_kind"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string"},
+    "context": {"type": "object"},
+    "jurisdictions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "expected_verdict": {"enum": ["permitted", "prohibited", "conditional", "unregulated", "indeterminate"]},
+    "justification": {"type": "string", "minLength": 1},
+    "source_kind": {"enum": ["synthetic_runtime", "reviewed_statute"]}
+  }
+}
