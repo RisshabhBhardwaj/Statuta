@@ -76,3 +76,28 @@ def test_prohibition_wins_over_permission_and_time_selection_is_half_open() -> N
         _rule("AA-PER-001", "permitted", {"always": True}), effective_at="2027-01-01T00:00:00-05:00"
     )
     assert select_rulesets(_context(), [expired]) == ()
+
+
+def test_obligations_accumulate_without_changing_the_permission_verdict() -> None:
+    obligation = _rule(
+        "AA-OBL-001", "obligation", {"always": True}, obligations=[{"kind": "audit_log"}]
+    )
+    permission = _rule("AA-PER-001", "permitted", {"always": True})
+
+    verdict = evaluate(_context(), [_ruleset(obligation, permission)])
+
+    assert verdict.value is VerdictValue.PERMITTED
+    assert verdict.obligations == ({"kind": "audit_log"},)
+
+
+def test_numeric_boundaries_and_missing_nexus_are_safe() -> None:
+    retention_limit = _rule(
+        "AA-PRO-001", "prohibited", {"field": "record.age_days", "op": "gt", "value": 21}
+    )
+    at_limit = _context()
+    at_limit["record"]["age_days"] = 21
+    assert evaluate(at_limit, [_ruleset(retention_limit)]).value is VerdictValue.UNREGULATED
+    assert evaluate(_context(), [_ruleset(retention_limit)]).value is VerdictValue.PROHIBITED
+
+    no_nexus = {"query": {"occurred_at": "2026-06-01T12:00:00-04:00"}}
+    assert evaluate(no_nexus, [_ruleset(retention_limit)]).value is VerdictValue.UNREGULATED

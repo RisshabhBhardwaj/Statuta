@@ -28,6 +28,7 @@ class Verdict:
     value: VerdictValue
     deciding_rules: tuple[str, ...]
     requirements_satisfied: bool | None
+    obligations: tuple[Mapping[str, Any], ...]
     resolution_path: tuple[str, ...]
     coverage: Mapping[str, Any]
 
@@ -105,11 +106,22 @@ def evaluate(context: Mapping[str, Any], rulesets: Sequence[Mapping[str, Any]]) 
         "jurisdictions_evaluated": [ruleset["jurisdiction"]["code"] for ruleset in selected],
         "indeterminate_rules": indeterminate,
     }
+    obligations = tuple(
+        obligation
+        for _, rule in fired
+        if rule["effect"] == "obligation"
+        for obligation in rule.get("obligations", [])
+    )
     prohibited = [(rs, rule) for rs, rule in fired if rule["effect"] == "prohibited"]
     if prohibited:
         rules = tuple(sorted(rule["id"] for _, rule in prohibited))
         return Verdict(
-            VerdictValue.PROHIBITED, rules, None, tuple(path + ["prohibition fired"]), coverage
+            VerdictValue.PROHIBITED,
+            rules,
+            None,
+            obligations,
+            tuple(path + ["prohibition fired"]),
+            coverage,
         )
     conditional = [(rs, rule) for rs, rule in fired if rule["effect"] == "conditional"]
     for _, rule in conditional:
@@ -123,6 +135,7 @@ def evaluate(context: Mapping[str, Any], rulesets: Sequence[Mapping[str, Any]]) 
                 VerdictValue.CONDITIONAL,
                 (rule["id"],),
                 True,
+                obligations,
                 tuple(path + ["conditional rule satisfied"]),
                 coverage,
             )
@@ -130,10 +143,27 @@ def evaluate(context: Mapping[str, Any], rulesets: Sequence[Mapping[str, Any]]) 
     if permitted:
         rules = tuple(sorted(rule["id"] for _, rule in permitted))
         return Verdict(
-            VerdictValue.PERMITTED, rules, None, tuple(path + ["permission fired"]), coverage
+            VerdictValue.PERMITTED,
+            rules,
+            None,
+            obligations,
+            tuple(path + ["permission fired"]),
+            coverage,
         )
     if indeterminate:
         return Verdict(
-            VerdictValue.INDETERMINATE, (), None, tuple(path + ["required facts missing"]), coverage
+            VerdictValue.INDETERMINATE,
+            (),
+            None,
+            obligations,
+            tuple(path + ["required facts missing"]),
+            coverage,
         )
-    return Verdict(VerdictValue.UNREGULATED, (), None, tuple(path + ["no rule fired"]), coverage)
+    return Verdict(
+        VerdictValue.UNREGULATED,
+        (),
+        None,
+        obligations,
+        tuple(path + ["no rule fired"]),
+        coverage,
+    )
