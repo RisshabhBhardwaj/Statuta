@@ -8,8 +8,13 @@ __all__ = [
     "GroundingError",
     "SemanticValidationError",
     "TruthValue",
+    "Verdict",
+    "VerdictValue",
+    "evaluate",
     "evaluate_predicate",
     "read_snapshot",
+    "select_rulesets",
     "validate_ruleset",
     "verify_grounding",
 ]
+from statuta.core.evaluate import Verdict, VerdictValue, evaluate, select_rulesets
