@@ -1,0 +1,56 @@
+{
+  "registry_version": "1.0.0",
+  "generated_at": "2026-08-26T17:09:35Z",
+  "normalization": {
+    "tool": "pdftotext",
+    "arguments": ["-layout"],
+    "warning": "These extraction artifacts are research inputs. Release-grade normalization and character-offset verification remain required before a ruleset release."
+  },
+  "sources": [
+    {
+      "source_id": "US-CT-PA-26-14-20260826",
+      "jurisdiction": "US-CT",
+      "citation": "Conn. Pub. Act No. 26-14, § 10",
+      "title": "An Act Concerning Democracy and Government Accountability and the Use and Retention of Data Derived from Automated License Plate Reader Systems",
+      "source_url": "https://www.cga.ct.gov/2026/act/pa/pdf/2026PA-00014-R00SB-00397-PA.pdf",
+      "source_tier": "official_enacted_act",
+      "retrieved_at": "2026-08-26T17:09:35Z",
+      "raw_path": "snapshots/raw/us-ct-pa-26-14.pdf",
+      "raw_sha256": "614c5c38e44e76c89410a73aed4ba44fdd7f97b646046fa1a8e731c1b061f076",
+      "normalized_path": "snapshots/normalized/us-ct-pa-26-14.txt",
+      "normalized_sha256": "5da7c7c04b22c954c3dc23b1511726b5493cfd1a7f745b183c3362ae1a331b2a",
+      "effective_date": "2026-10-01",
+      "historical_status": "future_effective_date_verified"
+    },
+    {
+      "source_id": "US-OR-SB-1516-ENROLLED-20260826",
+      "jurisdiction": "US-OR",
+      "citation": "2026 Or. Laws ch. 77 (Enrolled S.B. 1516)",
+      "title": "Enrolled Senate Bill 1516",
+      "source_url": "https://olis.oregonlegislature.gov/liz/2026R1/Downloads/MeasureDocument/SB1516/Enrolled",
+      "source_tier": "official_enrolled_act",
+      "retrieved_at": "2026-08-26T17:09:35Z",
+      "raw_path": "snapshots/raw/us-or-sb1516-enrolled.pdf",
+      "raw_sha256": "85b5ce4ab9578e01015611ddfb199739b977ca0c44203f2688e1088246699405",
+      "normalized_path": "snapshots/normalized/us-or-sb1516-enrolled.txt",
+      "normalized_sha256": "cf95fc066b3b747b89697bba4ffdd9b0292ea288a86557c59e6835d6669dd08a",
+      "effective_date": null,
+      "historical_status": "effective_on_passage_exact_date_pending"
+    },
+    {
+      "source_id": "US-VA-2.2-5517-20260826",
+      "jurisdiction": "US-VA",
+      "citation": "Va. Code Ann. § 2.2-5517",
+      "title": "Use of automatic license plate recognition systems by law-enforcement agencies",
+      "source_url": "https://law.lis.virginia.gov/pdf/vacode/2.2-5517/",
+      "source_tier": "official_current_code",
+      "retrieved_at": "2026-08-26T17:09:35Z",
+      "raw_path": "snapshots/raw/us-va-2.2-5517.pdf",
+      "raw_sha256": "404b89f38cce4d24e955a95df9e0fd41e718e856f0fd26f02ab36864b04dfdb5",
+      "normalized_path": "snapshots/normalized/us-va-2.2-5517.txt",
+      "normalized_sha256": "43cbe6653d3fca4e89f57b34bd9a43e51e9a899e2062a46227a98f4e42750628",
+      "effective_date": null,
+      "historical_status": "current_text_verified_historical_interval_pending"
+    }
+  ]
+}
