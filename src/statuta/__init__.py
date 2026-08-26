@@ -14,18 +14,23 @@ from statuta.core import (
     validate_ruleset,
     verify_grounding,
 )
+from statuta.scenarios import ScenarioError, ScenarioResult, generate_contexts, run_scenario
 
 __all__ = [
     "GroundingError",
     "SemanticValidationError",
+    "ScenarioError",
+    "ScenarioResult",
     "TruthValue",
     "Verdict",
     "VerdictValue",
     "evaluate",
     "evaluate_released",
     "evaluate_predicate",
+    "generate_contexts",
     "read_snapshot",
     "select_rulesets",
+    "run_scenario",
     "validate_ruleset",
     "verify_grounding",
 ]

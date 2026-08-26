@@ -2,7 +2,7 @@
 
 **Span-grounded, deterministic policy evaluation for automated license plate reader (ALPR) statutes.**
 
-> **Status: foundations in progress.** `statuta` is not yet a legal research service, a compliance product, or a released corpus. It currently ships only its public implementation scaffold. Do not rely on it to assess any real-world access decision.
+> **Status: foundations in progress.** `statuta` is not yet a legal research service, a compliance product, or a released corpus. It ships a deterministic evaluator for synthetic fixtures and a guarded production entry point, but no released statute corpus. Do not rely on it to assess any real-world access decision.
 
 ## Why this exists
 
@@ -35,6 +35,8 @@ uv run ruff check .
 uv run ty check src
 uv run pytest
 ```
+
+Synthetic gold scenarios live in [gold/](gold/README.md). They are executable conformance fixtures, not legal conclusions. The public production entry point accepts only released, semantically validated rulesets; the currently tracked jurisdiction artifacts are explicitly unreviewed drafts.
 
 ## Security and scope
 

@@ -1,0 +1,15 @@
+{
+  "id": "synthetic-retention-prohibited-at-22-days",
+  "context": {
+    "query": {
+      "occurred_at": "2026-06-01T12:00:00-04:00",
+      "requester": {"agency_jurisdiction": "US-AA"}
+    },
+    "record": {"captured_jurisdiction": "US-AA", "age_days": 22}
+  },
+  "jurisdictions": ["US-AA"],
+  "expected_verdict": "prohibited",
+  "expected_deciding_rules": ["AA-RET-001"],
+  "justification": "Synthetic retention limit: a record older than 21 days is prohibited.",
+  "source_kind": "synthetic_runtime"
+}

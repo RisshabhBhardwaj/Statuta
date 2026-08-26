@@ -93,23 +93,42 @@ def evaluate(context: Mapping[str, Any], rulesets: Sequence[Mapping[str, Any]]) 
     fired: list[tuple[Mapping[str, Any], Mapping[str, Any]]] = []
     indeterminate: list[str] = []
     path = [f"selected {ruleset['ruleset_id']}" for ruleset in selected]
+    considered: list[str] = []
+    indeterminate_reasons: list[dict[str, str]] = []
     for ruleset in selected:
         for rule in ruleset.get("rules", []):
+            considered.append(rule["id"])
             applies = evaluate_predicate(rule["applies_when"], context)
             if applies is TruthValue.UNKNOWN:
                 indeterminate.append(rule["id"])
+                indeterminate_reasons.append({"rule_id": rule["id"], "stage": "applies_when"})
                 continue
             if applies is not TruthValue.TRUE:
                 continue
             result = evaluate_predicate(rule["condition"], context)
             if result is TruthValue.UNKNOWN:
                 indeterminate.append(rule["id"])
+                indeterminate_reasons.append({"rule_id": rule["id"], "stage": "condition"})
                 continue
             if result is TruthValue.TRUE:
                 fired.append((ruleset, rule))
+                path.append(f"fired {rule['id']}")
     coverage: dict[str, Any] = {
         "jurisdictions_evaluated": [ruleset["jurisdiction"]["code"] for ruleset in selected],
+        "rulesets_evaluated": [
+            {"id": ruleset["ruleset_id"], "version": ruleset.get("ruleset_version")}
+            for ruleset in selected
+        ],
+        "rules_considered": considered,
+        "rules_fired": [rule["id"] for _, rule in fired],
         "indeterminate_rules": indeterminate,
+        "indeterminate_reasons": indeterminate_reasons,
+        "declared_coverage_gaps": [
+            {"jurisdiction": ruleset["jurisdiction"]["code"], "gap": gap}
+            for ruleset in selected
+            for gap in ruleset.get("coverage", {}).get("known_gaps", [])
+            if isinstance(gap, str)
+        ],
     }
     obligations = tuple(
         obligation
@@ -135,6 +154,7 @@ def evaluate(context: Mapping[str, Any], rulesets: Sequence[Mapping[str, Any]]) 
         ]
         if TruthValue.UNKNOWN in requirement_values:
             indeterminate.append(rule["id"])
+            indeterminate_reasons.append({"rule_id": rule["id"], "stage": "requirements"})
         elif all(value is TruthValue.TRUE for value in requirement_values):
             return Verdict(
                 VerdictValue.CONDITIONAL,

@@ -1,0 +1,15 @@
+{
+  "id": "synthetic-retention-unregulated-at-21-days",
+  "context": {
+    "query": {
+      "occurred_at": "2026-06-01T12:00:00-04:00",
+      "requester": {"agency_jurisdiction": "US-AA"}
+    },
+    "record": {"captured_jurisdiction": "US-AA", "age_days": 21}
+  },
+  "jurisdictions": ["US-AA"],
+  "expected_verdict": "unregulated",
+  "expected_deciding_rules": [],
+  "justification": "Synthetic retention limit uses a strict greater-than comparison.",
+  "source_kind": "synthetic_runtime"
+}

@@ -10,6 +10,11 @@
     "context": {"type": "object"},
     "jurisdictions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
     "expected_verdict": {"enum": ["permitted", "prohibited", "conditional", "unregulated", "indeterminate"]},
+    "expected_deciding_rules": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
     "justification": {"type": "string", "minLength": 1},
     "source_kind": {"enum": ["synthetic_runtime", "reviewed_statute"]}
   }

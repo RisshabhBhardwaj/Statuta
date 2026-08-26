@@ -119,6 +119,46 @@ def test_unknown_applicability_is_indeterminate() -> None:
 
     assert verdict.value is VerdictValue.INDETERMINATE
     assert verdict.coverage["indeterminate_rules"] == ["AA-PRO-001"]
+    assert verdict.coverage["indeterminate_reasons"] == [
+        {"rule_id": "AA-PRO-001", "stage": "applies_when"}
+    ]
+
+
+def test_coverage_and_resolution_path_explain_a_decision() -> None:
+    rule = _rule("AA-PRO-001", "prohibited", {"always": True})
+    ruleset = _ruleset(rule)
+    ruleset["ruleset_version"] = "0.0.0-synthetic"
+    ruleset["coverage"] = {"known_gaps": ["Synthetic exception is intentionally absent."]}
+
+    verdict = evaluate(_context(), [ruleset])
+
+    assert verdict.resolution_path == (
+        "selected US-AA",
+        "fired AA-PRO-001",
+        "prohibition fired",
+    )
+    assert verdict.coverage["rulesets_evaluated"] == [{"id": "US-AA", "version": "0.0.0-synthetic"}]
+    assert verdict.coverage["rules_considered"] == ["AA-PRO-001"]
+    assert verdict.coverage["rules_fired"] == ["AA-PRO-001"]
+    assert verdict.coverage["declared_coverage_gaps"] == [
+        {"jurisdiction": "US-AA", "gap": "Synthetic exception is intentionally absent."}
+    ]
+
+
+def test_unsatisfied_conditional_requirements_do_not_fire() -> None:
+    conditional = _rule(
+        "AA-CON-001",
+        "conditional",
+        {"always": True},
+        requirements=[{"field": "query.purpose.case_ref", "op": "is_not_null"}],
+    )
+
+    context = _context()
+    context["query"]["purpose"] = {"case_ref": None}
+    verdict = evaluate(context, [_ruleset(conditional)])
+
+    assert verdict.value is VerdictValue.UNREGULATED
+    assert verdict.requirements_satisfied is None
 
 
 def test_released_entry_point_rejects_draft_artifacts() -> None:
