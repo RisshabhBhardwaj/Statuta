@@ -26,3 +26,19 @@ def verify_checkpoint(
     except Exception:
         return False
     return True
+
+
+def countersign_checkpoint(private_key: Ed25519PrivateKey, checkpoint_signature: str) -> str:
+    """Create a witness signature over the operator's checkpoint signature."""
+    return base64.b64encode(private_key.sign(checkpoint_signature.encode())).decode()
+
+
+def verify_countersignature(
+    public_key: Ed25519PublicKey, checkpoint_signature: str, witness_signature: str
+) -> bool:
+    """Verify a witness's independent attestation of the exact checkpoint signature."""
+    try:
+        public_key.verify(base64.b64decode(witness_signature), checkpoint_signature.encode())
+    except Exception:
+        return False
+    return True

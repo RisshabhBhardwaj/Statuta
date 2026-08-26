@@ -20,7 +20,7 @@ def root_hash(leaves: tuple[bytes, ...]) -> bytes:
         return hashlib.sha256(b"").digest()
     if len(leaves) == 1:
         return _leaf(leaves[0])
-    split = 1 << (len(leaves).bit_length() - 2)
+    split = 1 << ((len(leaves) - 1).bit_length() - 1)
     return _node(root_hash(leaves[:split]), root_hash(leaves[split:]))
 
 
@@ -30,10 +30,26 @@ def inclusion_proof(leaves: tuple[bytes, ...], index: int) -> tuple[bytes, ...]:
         raise IndexError("leaf index is outside the tree")
     if len(leaves) == 1:
         return ()
-    split = 1 << (len(leaves).bit_length() - 2)
+    split = 1 << ((len(leaves) - 1).bit_length() - 1)
     if index < split:
         return inclusion_proof(leaves[:split], index) + (root_hash(leaves[split:]),)
     return inclusion_proof(leaves[split:], index - split) + (root_hash(leaves[:split]),)
+
+
+def consistency_proof(leaves: tuple[bytes, ...], old_size: int) -> tuple[bytes, ...]:
+    """Build an RFC 6962 consistency proof for a non-empty prefix."""
+    if not 0 < old_size <= len(leaves):
+        raise ValueError("old size must be within current tree")
+
+    def build(items: tuple[bytes, ...], size: int, include_root: bool) -> tuple[bytes, ...]:
+        if size == len(items):
+            return () if include_root else (root_hash(items),)
+        split = 1 << ((len(items) - 1).bit_length() - 1)
+        if size <= split:
+            return build(items[:split], size, include_root) + (root_hash(items[split:]),)
+        return build(items[split:], size - split, False) + (root_hash(items[:split]),)
+
+    return build(leaves, old_size, True)
 
 
 @dataclass(frozen=True)
@@ -52,3 +68,6 @@ class MerkleTree:
 
     def inclusion_proof(self, index: int) -> tuple[bytes, ...]:
         return inclusion_proof(self.leaves, index)
+
+    def consistency_proof(self, old_size: int) -> tuple[bytes, ...]:
+        return consistency_proof(self.leaves, old_size)

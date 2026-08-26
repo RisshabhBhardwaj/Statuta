@@ -17,7 +17,7 @@ def verify_inclusion(
         nonlocal proof_index
         if size == 1:
             return hashlib.sha256(b"\x00" + leaf).digest()
-        split = 1 << (size.bit_length() - 2)
+        split = 1 << ((size - 1).bit_length() - 1)
         if local_index < split:
             left = rebuild(local_index, split)
             sibling = proof[proof_index]
