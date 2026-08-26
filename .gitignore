@@ -1,0 +1,28 @@
+# Private pre-publication design corpus. The public repository starts with
+# implementation documentation written for release, not internal planning notes.
+/docs/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Local secrets and editor state
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/

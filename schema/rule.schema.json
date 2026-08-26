@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://statuta.dev/schema/rule.schema.json",
+  "title": "Rule",
+  "description": "A single machine-checkable rule extracted from a statutory provision. See docs/11-policy-dsl-spec.md.",
+  "type": "object",
+  "required": ["id", "rule_type", "effect", "applies_when", "condition", "grounding", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[A-Z]{2,3}-[A-Z]{3}-[0-9]{3}$" },
+    "rule_type": {
+      "enum": ["access", "purpose", "retention", "sharing", "collection", "audit", "notice", "remedy"]
+    },
+    "effect": { "enum": ["permitted", "prohibited", "conditional", "obligation"] },
+    "priority": { "type": "integer", "default": 100 },
+    "description": { "type": "string", "maxLength": 500 },
+    "applies_when": { "$ref": "#/$defs/predicate" },
+    "condition": { "$ref": "#/$defs/predicate" },
+    "requirements": { "type": "array", "items": { "$ref": "#/$defs/predicate" } },
+    "obligations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind"],
+        "additionalProperties": false,
+        "properties": {
+          "kind": { "enum": ["purge", "log", "report", "notify", "obtain_authorization", "restrict_access"] },
+          "deadline_days": { "type": "integer", "minimum": 0 },
+          "subject": { "enum": ["record", "query", "agency", "requester"] },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "exceptions": { "type": "array", "items": { "type": "string" } },
+    "grounding": { "$ref": "#/$defs/grounding" },
+    "interpretations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "summary", "rationale"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "enum": ["narrow", "broad", "alternative"] },
+          "summary": { "type": "string" },
+          "condition_override": { "$ref": "#/$defs/predicate" },
+          "rationale": { "type": "string" },
+          "default": { "type": "boolean", "default": false }
+        }
+      }
+    },
+    "provenance": { "$ref": "#/$defs/provenance" },
+    "tags": { "type": "array", "items": { "type": "string" } }
+  },
+
+  "$defs": {
+    "grounding": {
+      "type": "object",
+      "required": ["provision_id", "quote", "span", "snapshot_sha256"],
+      "additionalProperties": false,
+      "description": "quote MUST be a literal substring of the provision in the referenced snapshot. Enforced by CI gate G2.",
+      "properties": {
+        "provision_id": { "type": "string" },
+        "quote": { "type": "string", "minLength": 10 },
+        "span": {
+          "type": "array", "items": { "type": "integer", "minimum": 0 },
+          "minItems": 2, "maxItems": 2
+        },
+        "snapshot_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+
+    "provenance": {
+      "type": "object",
+      "required": ["method"],
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "enum": ["hand_encoded", "llm_proposed_human_reviewed", "llm_proposed_unreviewed"],
+          "description": "llm_proposed_unreviewed is EXCLUDED from released rulesets, not merely flagged."
+        },
+        "models": { "type": "array", "items": { "type": "string" } },
+        "model_agreement": { "type": "boolean" },
+        "extraction_confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "reviewed_by": { "type": "string" },
+        "reviewed_at": { "type": "string", "format": "date-time" },
+        "edited_from_proposal": { "type": "boolean" },
+        "review_notes": { "type": "string" },
+        "second_reviewer": { "type": "string" }
+      }
+    },
+
+    "predicate": {
+      "description": "Closed grammar. Four combinators, fourteen operators. Adding one requires an ADR.",
+      "oneOf": [
+        { "type": "object", "required": ["all"],  "additionalProperties": false,
+          "properties": { "all":  { "type": "array", "items": { "$ref": "#/$defs/predicate" }, "minItems": 1 } } },
+        { "type": "object", "required": ["any"],  "additionalProperties": false,
+          "properties": { "any":  { "type": "array", "items": { "$ref": "#/$defs/predicate" }, "minItems": 1 } } },
+        { "type": "object", "required": ["not"],  "additionalProperties": false,
+          "properties": { "not":  { "$ref": "#/$defs/predicate" } } },
+        { "type": "object", "required": ["always"], "additionalProperties": false,
+          "properties": { "always": { "const": true } } },
+        { "type": "object", "required": ["field", "op"], "additionalProperties": false,
+          "properties": {
+            "field": { "type": "string", "pattern": "^[a-z_]+(\\.[a-z_]+)*$" },
+            "op": { "enum": ["eq","ne","lt","lte","gt","gte","in","not_in","contains","is_null","is_not_null"] },
+            "value": {}
+          },
+          "allOf": [
+            { "if": { "properties": { "op": { "enum": ["eq","ne","lt","lte","gt","gte","in","not_in","contains"] } } },
+              "then": { "required": ["value"] } },
+            { "if": { "properties": { "op": { "enum": ["is_null","is_not_null"] } } },
+              "then": { "not": { "required": ["value"] } } }
+          ] },
+        { "type": "object", "required": ["field", "op", "value"], "additionalProperties": false,
+          "properties": {
+            "field": { "const": "query.authorization.level" },
+            "op": { "const": "authorization_at_least" },
+            "value": { "enum": ["none","supervisor","agency_head","court_order","warrant","exigent"] }
+          } },
+        { "type": "object", "required": ["op", "left", "right"], "additionalProperties": false,
+          "properties": {
+            "op": { "const": "jurisdiction_matches" },
+            "left": { "type": "string" }, "right": { "type": "string" }
+          } },
+        { "type": "object", "required": ["op", "where"], "additionalProperties": false,
+          "properties": {
+            "op": { "const": "any_recipient" },
+            "where": { "$ref": "#/$defs/predicate" }
+          } }
+      ]
+    }
+  }
+}

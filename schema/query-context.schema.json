@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://statuta.dev/schema/query-context.schema.json",
+  "title": "QueryContext",
+  "description": "Abstract, vendor-neutral, content-free input to evaluation. NOTE: there is deliberately no plate field anywhere in this schema. See docs/11-policy-dsl-spec.md section 5.2.",
+  "type": "object",
+  "required": ["context_version", "query"],
+  "additionalProperties": false,
+  "properties": {
+    "context_version": { "const": "1.0.0" },
+    "query": {
+      "type": "object",
+      "required": ["id", "timestamp", "requester", "purpose"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "requester": {
+          "type": "object",
+          "required": ["ref", "role", "agency_type", "agency_jurisdiction"],
+          "additionalProperties": false,
+          "properties": {
+            "ref": { "type": "string", "description": "Opaque pseudonymous id. Never a name." },
+            "role": { "enum": ["officer","analyst","supervisor","civilian_staff","external","unknown"] },
+            "employment_status": { "enum": ["active","separated","suspended","unknown"] },
+            "agency_ref": { "type": "string" },
+            "agency_type": { "enum": ["local","state","federal","tribal","private","unknown"] },
+            "agency_jurisdiction": { "type": "string" }
+          }
+        },
+        "purpose": {
+          "type": "object",
+          "required": ["code"],
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "enum": ["criminal_investigation","active_warrant_service","stolen_vehicle","amber_alert",
+                       "silver_alert","missing_person","traffic_enforcement","parking_enforcement",
+                       "toll_collection","civil_enforcement","immigration_enforcement","intelligence",
+                       "training","system_test","administrative","unspecified","other","unknown"]
+            },
+            "case_ref": { "type": ["string","null"] },
+            "free_text_present": { "type": "boolean", "description": "Presence flag only. Free text is never ingested." }
+          }
+        },
+        "authorization": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "level": { "enum": ["none","supervisor","agency_head","court_order","warrant","exigent","unknown"] },
+            "reference": { "type": "string" },
+            "issued_at": { "type": "string", "format": "date-time" }
+          }
+        },
+        "target_ref": { "type": ["string","null"], "description": "Opaque caller-supplied id. NEVER a plate value. The project provides no function to derive one from a plate." },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "jurisdictions_searched": { "type": "array", "items": { "type": "string" } },
+            "time_window_days": { "type": "integer", "minimum": 0 },
+            "network_scope": { "enum": ["own_agency","multi_agency","national","unknown"] },
+            "result_limit": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "captured_at": { "type": "string", "format": "date-time" },
+        "captured_jurisdiction": { "type": "string" },
+        "age_days": { "type": "integer", "minimum": 0 },
+        "kind": { "enum": ["plate_read","derived_attribute","image","unknown"] },
+        "hotlist_status": { "enum": ["hit","non_hit","unknown"] },
+        "origin_agency_type": { "enum": ["local","state","federal","tribal","private","unknown"] }
+      }
+    },
+    "disclosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "recipients": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "agency_type": { "enum": ["local","state","federal","tribal","private","unknown"] },
+              "agency_jurisdiction": { "type": "string" },
+              "purpose_code": {
+                "enum": ["criminal_investigation","active_warrant_service","stolen_vehicle","amber_alert",
+                           "silver_alert","missing_person","traffic_enforcement","parking_enforcement",
+                           "toll_collection","civil_enforcement","immigration_enforcement","intelligence",
+                           "training","system_test","administrative","unspecified","other","unknown"]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

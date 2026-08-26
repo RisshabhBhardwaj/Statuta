@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0.0",
+  "fields": {
+    "query.requester.role": "string",
+    "query.requester.employment_status": "string",
+    "query.requester.agency_type": "string",
+    "query.requester.agency_jurisdiction": "string",
+    "query.purpose.code": "string",
+    "query.purpose.case_ref": "string_or_null",
+    "query.authorization.level": "string",
+    "query.scope.jurisdictions_searched": "array",
+    "query.scope.network_scope": "string",
+    "query.scope.time_window_days": "integer",
+    "query.scope.result_limit": "integer",
+    "record.captured_jurisdiction": "string",
+    "record.age_days": "integer",
+    "record.kind": "string",
+    "record.hotlist_status": "string",
+    "record.origin_agency_type": "string"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://statuta.dev/schema/ruleset.schema.json",
+  "title": "Ruleset",
+  "description": "An immutable, historically valid release of rules for one jurisdiction.",
+  "type": "object",
+  "required": [
+    "schema_version", "ruleset_id", "ruleset_version", "jurisdiction",
+    "legal_validity", "source", "definitions", "rules", "coverage", "provenance"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "ruleset_id": { "type": "string", "pattern": "^[A-Z]{2,3}(?:-[A-Z0-9]{2,16})+$" },
+    "ruleset_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "jurisdiction": {
+      "type": "object",
+      "required": ["level", "code", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "level": { "enum": ["federal", "state", "county", "municipal", "agency"] },
+        "code": { "type": "string" },
+        "name": { "type": "string", "minLength": 1 }
+      }
+    },
+    "legal_validity": {
+      "type": "object",
+      "required": ["effective_at", "repealed_or_superseded_at", "time_basis", "authority"],
+      "additionalProperties": false,
+      "properties": {
+        "effective_at": { "type": "string", "format": "date-time" },
+        "repealed_or_superseded_at": { "type": ["string", "null"], "format": "date-time" },
+        "time_basis": { "const": "jurisdiction_local" },
+        "authority": {
+          "type": "object",
+          "required": ["citation", "snapshot_sha256", "span"],
+          "additionalProperties": false,
+          "properties": {
+            "citation": { "type": "string", "minLength": 1 },
+            "snapshot_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            "span": {
+              "type": "array", "items": { "type": "integer", "minimum": 0 },
+              "minItems": 2, "maxItems": 2
+            }
+          }
+        }
+      }
+    },
+    "source": { "type": "object" },
+    "definitions": { "type": "array" },
+    "rules": { "type": "array", "items": { "$ref": "rule.schema.json" } },
+    "coverage": { "type": "object" },
+    "provenance": { "type": "object" }
+  }
+}

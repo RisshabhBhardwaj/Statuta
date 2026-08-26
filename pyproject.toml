@@ -1,0 +1,41 @@
+[project]
+name = "statuta"
+version = "0.1.0"
+description = "Span-grounded, deterministic policy evaluation for ALPR statutes."
+authors = [
+    { name = "Risshabh Bhardwaj", email = "bhardw30@purdue.edu" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.13.4",
+]
+
+[build-system]
+requires = ["uv_build>=0.10.7,<0.11.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers --cov=statuta --cov-report=term-missing --cov-fail-under=90"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ty.environment]
+python-version = "3.12"
+
+[tool.ty.terminal]
+error-on-warning = true
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.165.10",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.4",
+    "ty>=0.0.74",
+]
