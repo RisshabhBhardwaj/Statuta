@@ -1,0 +1,54 @@
+"""RFC 6962 domain-separated Merkle hashing and inclusion proofs."""
+
+from __future__ import annotations
+
+import hashlib
+from dataclasses import dataclass
+
+
+def _leaf(data: bytes) -> bytes:
+    return hashlib.sha256(b"\x00" + data).digest()
+
+
+def _node(left: bytes, right: bytes) -> bytes:
+    return hashlib.sha256(b"\x01" + left + right).digest()
+
+
+def root_hash(leaves: tuple[bytes, ...]) -> bytes:
+    """Return the RFC 6962 tree hash for a non-empty ordered leaf sequence."""
+    if not leaves:
+        return hashlib.sha256(b"").digest()
+    if len(leaves) == 1:
+        return _leaf(leaves[0])
+    split = 1 << (len(leaves).bit_length() - 2)
+    return _node(root_hash(leaves[:split]), root_hash(leaves[split:]))
+
+
+def inclusion_proof(leaves: tuple[bytes, ...], index: int) -> tuple[bytes, ...]:
+    """Create an RFC 6962 audit path for ``leaves[index]``."""
+    if not 0 <= index < len(leaves):
+        raise IndexError("leaf index is outside the tree")
+    if len(leaves) == 1:
+        return ()
+    split = 1 << (len(leaves).bit_length() - 2)
+    if index < split:
+        return inclusion_proof(leaves[:split], index) + (root_hash(leaves[split:]),)
+    return inclusion_proof(leaves[split:], index - split) + (root_hash(leaves[:split]),)
+
+
+@dataclass(frozen=True)
+class MerkleTree:
+    """An immutable in-memory tree; storage is intentionally caller-owned."""
+
+    leaves: tuple[bytes, ...]
+
+    @property
+    def root_hash(self) -> bytes:
+        return root_hash(self.leaves)
+
+    def append(self, data: bytes) -> MerkleTree:
+        """Return a new tree without mutating prior append-only history."""
+        return MerkleTree((*self.leaves, data))
+
+    def inclusion_proof(self, index: int) -> tuple[bytes, ...]:
+        return inclusion_proof(self.leaves, index)
