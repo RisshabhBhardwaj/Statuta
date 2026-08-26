@@ -1,5 +1,5 @@
 """Public package surface for statuta."""
 
-from statuta.core import SemanticValidationError, validate_ruleset
+from statuta.core import SemanticValidationError, TruthValue, evaluate_predicate, validate_ruleset
 
-__all__ = ["SemanticValidationError", "validate_ruleset"]
+__all__ = ["SemanticValidationError", "TruthValue", "evaluate_predicate", "validate_ruleset"]
