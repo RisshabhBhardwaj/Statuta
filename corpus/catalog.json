@@ -1,0 +1,9 @@
+{
+  "catalog_version": "0.1.0",
+  "status": "pre-release",
+  "jurisdictions": [
+    {"code": "US-CT", "status": "candidate_unreviewed", "candidate_path": "research/candidates/US-CT/0.0.0.json"},
+    {"code": "US-OR", "status": "candidate_unreviewed", "candidate_path": "research/candidates/US-OR/0.0.0.json"},
+    {"code": "US-VA", "status": "candidate_unreviewed", "candidate_path": "research/candidates/US-VA/0.0.0.json"}
+  ]
+}

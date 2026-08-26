@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use Statuta, please cite it using this metadata."
+title: "Statuta"
+type: software
+authors:
+  - family-names: "Bhardwaj"
+    given-names: "Risshabh"
+repository-code: "https://github.com/RisshabhBhardwaj/Statuta"
+license: "Apache-2.0"
+version: "0.1.0"
+date-released: "2026-08-26"

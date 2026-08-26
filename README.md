@@ -44,6 +44,8 @@ The [compile-plane pipeline](PIPELINE.md) is available for reproducible candidat
 
 This repository is designed for public law and synthetic fixtures only. Please see [SECURITY.md](SECURITY.md) for responsible reporting. Issues that could produce a permissive evaluation error are treated as security issues.
 
+Corpus status and coverage are tracked explicitly in the [catalog](corpus/README.md). Corrections are handled under the public [correction protocol](CORRECTIONS.md); released artifacts are immutable and corrected through versioned replacements.
+
 ## License
 
-Code is licensed under [Apache-2.0](LICENSE). Any future corpus release will carry its own data license and provenance metadata.
+Code is licensed under [Apache-2.0](LICENSE). Corpus data is licensed under [CC BY 4.0](LICENSE-DATA) and will always carry its own provenance metadata.
