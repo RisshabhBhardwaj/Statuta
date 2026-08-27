@@ -73,6 +73,34 @@ def numeric_boundary_contexts(rulesets: Sequence[Mapping[str, Any]]) -> list[dic
     return contexts
 
 
+def generate_gold_suite(seed: int, count: int = 150) -> list[dict[str, Any]]:
+    """Create a reproducible, content-free five-class synthetic scenario suite."""
+    classes = ("clear", "boundary", "missing_field", "cross_jurisdiction", "unregulated")
+    contexts = generate_contexts(seed, count)
+    suite: list[dict[str, Any]] = []
+    for index, raw_context in enumerate(contexts):
+        context: dict[str, Any] = raw_context
+        scenario_class = classes[index % len(classes)]
+        item: dict[str, Any] = {
+            "id": f"synthetic-{index:03d}",
+            "scenario_class": scenario_class,
+            "context": context,
+        }
+        if scenario_class == "missing_field":
+            item["context"] = {
+                "query": context["query"],
+                "record": {"captured_jurisdiction": "US-AA"},
+            }
+        if scenario_class == "cross_jurisdiction":
+            query: dict[str, Any] = item["context"]["query"]
+            query["scope"] = {"jurisdictions_searched": ["US-AA", "US-BB"]}
+        if scenario_class == "unregulated":
+            record: dict[str, Any] = item["context"]["record"]
+            record["captured_jurisdiction"] = "US-ZZ"
+        suite.append(item)
+    return suite
+
+
 def run_scenario(
     scenario: Mapping[str, Any], rulesets: Sequence[Mapping[str, Any]]
 ) -> ScenarioResult:
