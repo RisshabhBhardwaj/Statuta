@@ -7,7 +7,13 @@ from pathlib import Path
 
 import pytest
 
-from statuta.corpus import CorpusError, coverage_summary, released_ruleset_paths, validate_catalog
+from statuta.corpus import (
+    CorpusError,
+    complete_catalog,
+    coverage_summary,
+    released_ruleset_paths,
+    validate_catalog,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -22,3 +28,12 @@ def test_public_catalog_is_valid_and_does_not_release_candidates() -> None:
 def test_absent_rulesets_require_an_explanation() -> None:
     with pytest.raises(CorpusError, match="documented basis"):
         validate_catalog({"jurisdictions": [{"code": "US-AA", "status": "absent_ruleset"}]})
+
+
+def test_complete_catalog_never_silently_omits_a_state() -> None:
+    catalog = complete_catalog({"jurisdictions": [{"code": "US-CT", "status": "coverage_pending"}]})
+    assert len(catalog["jurisdictions"]) == 50
+    assert (
+        next(item for item in catalog["jurisdictions"] if item["code"] == "US-CT")["status"]
+        == "coverage_pending"
+    )

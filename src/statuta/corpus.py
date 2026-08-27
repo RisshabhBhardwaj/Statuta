@@ -5,6 +5,59 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+US_STATE_CODES = (
+    "US-AL",
+    "US-AK",
+    "US-AZ",
+    "US-AR",
+    "US-CA",
+    "US-CO",
+    "US-CT",
+    "US-DE",
+    "US-FL",
+    "US-GA",
+    "US-HI",
+    "US-ID",
+    "US-IL",
+    "US-IN",
+    "US-IA",
+    "US-KS",
+    "US-KY",
+    "US-LA",
+    "US-ME",
+    "US-MD",
+    "US-MA",
+    "US-MI",
+    "US-MN",
+    "US-MS",
+    "US-MO",
+    "US-MT",
+    "US-NE",
+    "US-NV",
+    "US-NH",
+    "US-NJ",
+    "US-NM",
+    "US-NY",
+    "US-NC",
+    "US-ND",
+    "US-OH",
+    "US-OK",
+    "US-OR",
+    "US-PA",
+    "US-RI",
+    "US-SC",
+    "US-SD",
+    "US-TN",
+    "US-TX",
+    "US-UT",
+    "US-VT",
+    "US-VA",
+    "US-WA",
+    "US-WV",
+    "US-WI",
+    "US-WY",
+)
+
 
 class CorpusError(ValueError):
     """Raised when a corpus catalog makes an unsafe release claim."""
@@ -48,3 +101,13 @@ def coverage_summary(catalog: Mapping[str, Any]) -> Mapping[str, int]:
         status = entry["status"]
         summary[status] = summary.get(status, 0) + 1
     return summary
+
+
+def complete_catalog(catalog: Mapping[str, Any]) -> dict[str, Any]:
+    """Return all fifty states with unknown coverage recorded explicitly, never implied."""
+    validate_catalog(catalog)
+    existing = {entry["code"]: dict(entry) for entry in catalog["jurisdictions"]}
+    entries = [
+        existing.get(code, {"code": code, "status": "coverage_pending"}) for code in US_STATE_CODES
+    ]
+    return {**catalog, "jurisdictions": entries}
