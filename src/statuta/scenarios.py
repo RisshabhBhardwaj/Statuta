@@ -49,6 +49,30 @@ def generate_contexts(seed: int, count: int) -> list[dict[str, Any]]:
     ]
 
 
+def numeric_boundary_contexts(rulesets: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Generate synthetic n-1/n/n+1 contexts for every numeric rule threshold."""
+    contexts: list[dict[str, Any]] = []
+    for ruleset in rulesets:
+        for rule in ruleset.get("rules", []):
+            condition = rule.get("condition", {})
+            if not isinstance(condition, Mapping) or not isinstance(condition.get("value"), int):
+                continue
+            field = condition.get("field")
+            if field != "record.age_days":
+                continue
+            for value in (condition["value"] - 1, condition["value"], condition["value"] + 1):
+                contexts.append(
+                    {
+                        "query": {"occurred_at": "2026-06-01T12:00:00-04:00"},
+                        "record": {
+                            "captured_jurisdiction": ruleset["jurisdiction"]["code"],
+                            "age_days": value,
+                        },
+                    }
+                )
+    return contexts
+
+
 def run_scenario(
     scenario: Mapping[str, Any], rulesets: Sequence[Mapping[str, Any]]
 ) -> ScenarioResult:
