@@ -38,3 +38,13 @@ def released_ruleset_paths(catalog: Mapping[str, Any]) -> tuple[str, ...]:
     return tuple(
         entry["ruleset_path"] for entry in catalog["jurisdictions"] if entry["status"] == "released"
     )
+
+
+def coverage_summary(catalog: Mapping[str, Any]) -> Mapping[str, int]:
+    """Count explicit jurisdiction coverage states for public reporting."""
+    validate_catalog(catalog)
+    summary: dict[str, int] = {}
+    for entry in catalog["jurisdictions"]:
+        status = entry["status"]
+        summary[status] = summary.get(status, 0) + 1
+    return summary

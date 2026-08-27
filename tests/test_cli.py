@@ -34,3 +34,17 @@ def test_cli_reports_pre_release_catalog(monkeypatch: object, capsys: object) ->
     )
     main()
     assert '"status": "pre-release"' in capsys.readouterr().out
+
+
+def test_cli_operates_an_opaque_local_log(
+    monkeypatch: object, capsys: object, tmp_path: Path
+) -> None:
+    path = tmp_path / "events.jsonl"
+    monkeypatch.setattr(
+        sys, "argv", ["statuta", "log-append", "--path", str(path), "--opaque-event", "event"]
+    )
+    main()
+    assert '"index": 0' in capsys.readouterr().out
+    monkeypatch.setattr(sys, "argv", ["statuta", "log-checkpoint", "--path", str(path)])
+    main()
+    assert '"tree_size": 1' in capsys.readouterr().out
