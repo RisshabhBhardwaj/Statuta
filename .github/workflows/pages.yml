@@ -8,6 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v7
       - run: uv sync --all-groups
       - run: uv run python -c "import json; from pathlib import Path; from statuta.viewer import render_catalog; Path('site').mkdir(exist_ok=True); Path('site/index.html').write_text(render_catalog(json.loads(Path('corpus/catalog.json').read_text())))"
